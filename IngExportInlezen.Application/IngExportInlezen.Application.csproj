@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IngExportInlezen.Domain\IngExportInlezen.Domain.csproj" />
+    <ProjectReference Include="..\IngExportInlezen.Services\IngExportInlezen.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
