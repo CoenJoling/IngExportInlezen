@@ -4,7 +4,7 @@ namespace IngExportInlezen.Services
 {
     public static class ConsoleServices
     {
-        public static void ResultatenEnOverigeKosten(List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
+        public static decimal ResultatenEnOverigeKosten(List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
         {
             foreach (string entry in resultList)
             {
@@ -40,9 +40,10 @@ namespace IngExportInlezen.Services
             {
                 Console.WriteLine($"Overige kosten post: {uniqueNaam.Naam} || {uniqueNaam.Bedrag}");
             }
+            return bedragRest;
         }
 
-        public static void Spaaropdrachten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static decimal Spaaropdrachten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var inleggenSpaaropdrachtenList = new List<IngExport_Internal>();
             var opgenomenSpaaropdrachtenList = new List<IngExport_Internal>();
@@ -66,12 +67,14 @@ namespace IngExportInlezen.Services
 
             var inleggenSpaaropdrachtenBedrag = inleggenSpaaropdrachtenList.Sum(x => x.Bedrag);
             var opgenomenpaaropdrachtenBedrag = opgenomenSpaaropdrachtenList.Sum(x => x.Bedrag);
+            var netto = inleggenSpaaropdrachtenBedrag - opgenomenpaaropdrachtenBedrag;
             resultList.Add($"Het totale bedrag voor spaaropdrachten is: {inleggenSpaaropdrachtenBedrag}");
             resultList.Add($"De totale hoeveelheid opgenomen van spaarrekeningen is: {opgenomenpaaropdrachtenBedrag}");
-            resultList.Add($"Netto gespaard: {inleggenSpaaropdrachtenBedrag - opgenomenpaaropdrachtenBedrag}");
+            resultList.Add($"Netto gespaard: {netto}");
+            return netto;
         }
 
-        public static void OverigeInkomsten(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static decimal OverigeInkomsten(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var overigeInkomstenList = new List<IngExport_Internal>();
 
@@ -88,9 +91,10 @@ namespace IngExportInlezen.Services
 
             var inkomstenBedrag = overigeInkomstenList.Sum(x => x.Bedrag);
             resultList.Add($"Overige inkomsten: {inkomstenBedrag}");
+            return inkomstenBedrag;
         }
 
-        public static void InkomstenSalaris(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static decimal InkomstenSalaris(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var salarisList = new List<IngExport_Internal>();
             foreach (var salaris in appSettings.InkomstenSalaris)
@@ -101,9 +105,10 @@ namespace IngExportInlezen.Services
             }
             var salarisBedrag = salarisList.Sum(x => x.Bedrag);
             resultList.Add($"Inkomsten salaris: {salarisBedrag}");
+            return salarisBedrag;
         }
 
-        public static void Tanken(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static decimal Tanken(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var tankenList = new List<IngExport_Internal>();
             foreach (var tank in appSettings.Tanken)
@@ -115,9 +120,10 @@ namespace IngExportInlezen.Services
 
             var tankenBedrag = tankenList.Sum(x => x.Bedrag);
             resultList.Add($"Kosten tanken: {tankenBedrag}");
+            return tankenBedrag;
         }
 
-        public static void GeldOpname(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
+        public static decimal GeldOpname(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
         {
             var geldOpnameList = new List<IngExport_Internal>();
 
@@ -128,9 +134,10 @@ namespace IngExportInlezen.Services
 
             var geldOpnameBedrag = geldOpnameList.Sum(x => x.Bedrag);
             resultList.Add($"Geld opnames: {geldOpnameBedrag}");
+            return geldOpnameBedrag;
         }
 
-        public static void Boodschappen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static decimal Boodschappen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var boodschappenList = new List<IngExport_Internal>();
             foreach (var winkel in appSettings.Boodschappen)
@@ -143,19 +150,30 @@ namespace IngExportInlezen.Services
             var ahCount = boodschappenList.Count(x => x.Naam.Contains("Albert Heijn".ToLower()));
             var plusCount = boodschappenList.Count(x => x.Naam.Contains("Plus".ToLower()));
 
-            var gemiddeldeAlbertHeijn = Math.Round(boodschappenList.Where(entry => entry.Naam.Contains("Albert Heijn".ToLower()))
-                .Average(entry => entry.Bedrag), 2);
+            if (boodschappenList != null && boodschappenList.Any(entry => entry.Naam.Contains("Albert Heijn".ToLower())))
+            {
+                var gemiddeldeAlbertHeijn = Math.Round(boodschappenList
+                    .Where(entry => entry.Naam.Contains("Albert Heijn".ToLower()))
+                    .Average(entry => entry.Bedrag), 2);
 
-            var gemiddeldePlus = Math.Round(boodschappenList.Where(entry => entry.Naam.Contains("Plus".ToLower()))
-                .Average(entry => entry.Bedrag), 2);
+                resultList.Add($"Gemiddeld bij AH(n={ahCount}): {gemiddeldeAlbertHeijn}");
+            }
+
+            if (boodschappenList != null && boodschappenList.Any(entry => entry.Naam.Contains("Plus".ToLower())))
+            {
+                var gemiddeldePlus = Math.Round(boodschappenList
+                    .Where(entry => entry.Naam.Contains("Plus".ToLower()))
+                    .Average(entry => entry.Bedrag), 2);
+
+                resultList.Add($"Gemiddeld bij Plus(n={plusCount}): {gemiddeldePlus}");
+            }
 
             var boodschappenBedrag = boodschappenList.Sum(x => x.Bedrag);
             resultList.Add($"Kosten boodschappen: {boodschappenBedrag}");
-            resultList.Add($"Gemiddeld bij AH(n={ahCount}): {gemiddeldeAlbertHeijn}");
-            resultList.Add($"Gemiddeld bij Plus(n={plusCount}): {gemiddeldePlus}");
+            return boodschappenBedrag;
         }
 
-        public static void VasteLasten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static decimal VasteLasten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var vasteLastenList = new List<IngExport_Internal>();
             foreach (var last in appSettings.VasteLasten)
@@ -167,6 +185,7 @@ namespace IngExportInlezen.Services
 
             var vastenLastenBedrag = vasteLastenList.Sum(x => x.Bedrag);
             resultList.Add($"Kosten vaste lasten: {vastenLastenBedrag}");
+            return vastenLastenBedrag;
         }
 
         public static decimal Abonnementen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)

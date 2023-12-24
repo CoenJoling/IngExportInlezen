@@ -33,12 +33,14 @@ namespace IngExportInlezen.Application
             {
                 Console.Clear();
                 Console.WriteLine("Geen geschikt bestand gevonden in de map");
+                Console.ReadLine();
                 return;
             }
             else if (matchingFiles.Length > 1)
             {
                 Console.Clear();
                 Console.WriteLine("Er staan meerdere bestanden met de opgegeven criteria in de map. App gestopt!");
+                Console.ReadLine();
                 return;
             }
             else
@@ -91,15 +93,16 @@ namespace IngExportInlezen.Application
                     var unassignedEntries = new List<IngExport_Internal>();
 
                     var excelExport = new ExcelExport();
+                    excelExport.Maand = completeCsvList.FirstOrDefault().Datum.ToString("MMMM yyyy");
                     excelExport.Abonnementen = ConsoleServices.Abonnementen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    ConsoleServices.VasteLasten(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    ConsoleServices.Boodschappen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    ConsoleServices.GeldOpname(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList, unassignedEntries);
-                    ConsoleServices.Tanken(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    ConsoleServices.InkomstenSalaris(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    ConsoleServices.OverigeInkomsten(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    ConsoleServices.Spaaropdrachten(appSettings, completeCsvList, resultList, assignedLineList);
-                    ConsoleServices.ResultatenEnOverigeKosten(completeCsvList, resultList, assignedLineList, unassignedEntries);
+                    excelExport.VasteLasten = ConsoleServices.VasteLasten(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
+                    excelExport.Boodschappen = ConsoleServices.Boodschappen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
+                    excelExport.GeldOpnames = ConsoleServices.GeldOpname(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList, unassignedEntries);
+                    excelExport.Tanken = ConsoleServices.Tanken(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
+                    excelExport.InkomstenSalaris = ConsoleServices.InkomstenSalaris(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
+                    excelExport.OverigeInkomsten = ConsoleServices.OverigeInkomsten(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
+                    excelExport.SpaarOpdrachten = ConsoleServices.Spaaropdrachten(appSettings, completeCsvList, resultList, assignedLineList);
+                    excelExport.OverigeKosten = ConsoleServices.ResultatenEnOverigeKosten(completeCsvList, resultList, assignedLineList, unassignedEntries);
 
                     Console.WriteLine("\nMaak een keuze \n" +
                         "Druk op 1 om de resultaten in Excel te importen\n" +
@@ -109,11 +112,22 @@ namespace IngExportInlezen.Application
                     switch(input)
                     {
                         case "1":
-                            ExcelExporter.ExportToExcel(excelExport);
+                            try
+                            {
+                                ExcelExporter.ExportToExcel(excelExport);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                Console.ReadKey();
+                                throw;
+                            }
+                            Console.WriteLine("\nDe gegevens zijn succesvol in de Excel sheet geschreven!\n");
                             break;
                         default:
                             break;
                     }
+                    Console.ReadKey();
                 }
             }
         }

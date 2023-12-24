@@ -11,5 +11,6 @@
         public decimal InkomstenSalaris { get; set; }
         public decimal OverigeInkomsten { get; set; }
         public decimal SpaarOpdrachten { get; set; }
+        public decimal OverigeKosten { get; set; }
     }
 }
