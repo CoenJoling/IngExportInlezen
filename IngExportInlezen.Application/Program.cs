@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using IngExportInlezen.Domain;
 using IngExportInlezen.Services;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace IngExportInlezen.Application
@@ -11,10 +12,10 @@ namespace IngExportInlezen.Application
     {
         static void Main()
         {
-            Console.WriteLine("\nZorg ervoor dat 1 ING export bestand in de map staat!\n");
-            Task.Delay(2000).Wait();
-            Console.WriteLine("\nControleren...\n");
-            Task.Delay(2000).Wait();
+            //Console.WriteLine("\nZorg ervoor dat 1 ING export bestand in de map staat!\n");
+            //Task.Delay(2000).Wait();
+            //Console.WriteLine("\nControleren...\n");
+            //Task.Delay(2000).Wait();
 
             string folderPath = @"C:\Users\coenj\Documents\Financieel overzicht\ING export\";
 
@@ -47,14 +48,14 @@ namespace IngExportInlezen.Application
             {
                 string csvInput = matchingFiles[0];
 
-                Console.WriteLine("\nInlezen ING Export...\n");
+                //Console.WriteLine("\nInlezen ING Export...\n");
 
-                Task.Delay(1000).Wait();
+                //Task.Delay(1000).Wait();
 
-                Console.WriteLine("...");
+                //Console.WriteLine("...");
 
-                Task.Delay(1000).Wait();
-                Console.Clear();
+                //Task.Delay(1000).Wait();
+                //Console.Clear();
 
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
@@ -93,7 +94,7 @@ namespace IngExportInlezen.Application
                     var unassignedEntries = new List<IngExport_Internal>();
 
                     var excelExport = new ExcelExport();
-                    excelExport.Maand = completeCsvList.FirstOrDefault().Datum.ToString("MMMM yyyy");
+                    excelExport.Maand = completeCsvList?.FirstOrDefault()?.Datum.ToString("MMMM yyyy");
                     excelExport.Abonnementen = ConsoleServices.Abonnementen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
                     excelExport.VasteLasten = ConsoleServices.VasteLasten(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
                     excelExport.Boodschappen = ConsoleServices.Boodschappen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
