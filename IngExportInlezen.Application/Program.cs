@@ -102,7 +102,7 @@ namespace IngExportInlezen.Application
                     excelExport.InkomstenSalaris = ConsoleServices.InkomstenSalaris(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
                     excelExport.OverigeInkomsten = ConsoleServices.OverigeInkomsten(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
                     excelExport.SpaarOpdrachten = ConsoleServices.Spaaropdrachten(appSettings, completeCsvList, resultList, assignedLineList);
-                    excelExport.OverigeKosten = ConsoleServices.ResultatenEnOverigeKosten(completeCsvList, resultList, assignedLineList, unassignedEntries);
+                    excelExport.OverigeKosten = (ConsoleServices.ResultatenEnOverigeKosten(completeCsvList, resultList, assignedLineList, unassignedEntries)) * -1;
 
                     Console.WriteLine("\nMaak een keuze \n" +
                         "Druk op 1 om de resultaten in Excel te importen\n" +
