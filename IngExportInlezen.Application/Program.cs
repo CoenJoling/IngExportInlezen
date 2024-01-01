@@ -3,7 +3,6 @@ using CsvHelper.Configuration;
 using IngExportInlezen.Domain;
 using IngExportInlezen.Services;
 using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
 using System.Globalization;
 
 namespace IngExportInlezen.Application
@@ -12,11 +11,6 @@ namespace IngExportInlezen.Application
     {
         static void Main()
         {
-            //Console.WriteLine("\nZorg ervoor dat 1 ING export bestand in de map staat!\n");
-            //Task.Delay(2000).Wait();
-            //Console.WriteLine("\nControleren...\n");
-            //Task.Delay(2000).Wait();
-
             string folderPath = @"C:\Users\coenj\Documents\Financieel overzicht\ING export\";
 
             string[] files = Directory.GetFiles(folderPath);
@@ -93,44 +87,68 @@ namespace IngExportInlezen.Application
                     var assignedLineList = new List<IngExport_Internal>();
                     var unassignedEntries = new List<IngExport_Internal>();
 
-                    var excelExport = new ExcelExport();
-                    excelExport.Maand = completeCsvList?.FirstOrDefault()?.Datum.ToString("MMMM yyyy");
-                    excelExport.Abonnementen = ConsoleServices.Abonnementen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    excelExport.VasteLasten = ConsoleServices.VasteLasten(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    excelExport.Boodschappen = ConsoleServices.Boodschappen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    excelExport.GeldOpnames = ConsoleServices.GeldOpname(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList, unassignedEntries);
-                    excelExport.Tanken = ConsoleServices.Tanken(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    excelExport.InkomstenSalaris = ConsoleServices.InkomstenSalaris(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    excelExport.OverigeInkomsten = ConsoleServices.OverigeInkomsten(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList);
-                    excelExport.SpaarOpdrachten = ConsoleServices.Spaaropdrachten(appSettings, completeCsvList, resultList, assignedLineList);
-                    excelExport.OverigeKosten = (ConsoleServices.ResultatenEnOverigeKosten(completeCsvList, resultList, assignedLineList, unassignedEntries)) * -1;
-
-                    Console.WriteLine("\nMaak een keuze \n" +
-                        "Druk op 1 om de resultaten in Excel te importen\n" +
-                        "Druk op een knop om af te sluiten\n");
-                    var input = Console.ReadKey().KeyChar.ToString();
-
-                    switch(input)
+                    var (inleggenList, opgenomenList) = INGSorteerServices.Spaaropdrachten(appSettings, completeCsvList, resultList, assignedLineList);
+                    var maand = completeCsvList?.FirstOrDefault()?.Datum.ToString("MMMM yyyy");
+                    var excelExport = new ExcelExport
                     {
-                        case "1":
-                            try
-                            {
-                                ExcelExporter.ExportToExcel(excelExport);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.Message);
-                                Console.ReadKey();
-                                throw;
-                            }
-                            Console.WriteLine("\nDe gegevens zijn succesvol in de Excel sheet geschreven!\n");
-                            break;
-                        default:
-                            break;
+                        Boodschappen = INGSorteerServices.Boodschappen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList),
+                        Maand = maand,
+                        Abonnementen = INGSorteerServices.Abonnementen(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList),
+                        VasteLasten = INGSorteerServices.VasteLasten(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList),
+                        GeldOpnames = INGSorteerServices.GeldOpname(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList, unassignedEntries),
+                        Tanken = INGSorteerServices.Tanken(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList),
+                        InkomstenSalaris = INGSorteerServices.InkomstenSalaris(appSettings, completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList),
+                        OverigeInkomsten = INGSorteerServices.OverigeInkomsten(completeCsvList, laatsteDatum, eersteDatum, resultList, assignedLineList),
+                        OverigeKosten = INGSorteerServices.ResultatenEnOverigeKosten(completeCsvList, resultList, assignedLineList, unassignedEntries),
+                        SpaarOpdrachtenIngelegd = inleggenList,
+                        SpaarOpdrachtenOpgenomen = opgenomenList
+                    };
+
+                    var inputChecker = true;
+                    Console.WriteLine("\nMaak een keuze \n" +
+                            "Druk op 1 om de resultaten in een maandoverzicht in Excel te importen\n" +
+                            "Druk op 2 om de resultaten in het jaaroverzicht in Excel te schrijven\n" +
+                            "Druk op een knop om af te sluiten\n");
+                    while (inputChecker)
+                    {
+                        var input = Console.ReadKey().KeyChar.ToString();
+
+                        switch (input)
+                        {
+                            case "1":
+                                try
+                                {
+                                    ExcelExporter.ExportToMaandExcel(excelExport);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.Message);
+                                    Console.ReadKey();
+                                    throw;
+                                }
+                                Console.WriteLine("\nDe gegevens zijn succesvol in de Excel maandsheet geschreven!\n");
+                                break;
+                            case "2":
+                                try
+                                {
+                                    ExcelExporter.ExportToJaaroverzichtExcel(excelExport);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.Message);
+                                    Console.ReadKey();
+                                    throw;
+                                }
+                                Console.WriteLine("\nDe gegevens zijn succesvol in de Excel jaarsheet geschreven!\n");
+                                break;
+                            default:
+                                inputChecker = false;
+                                break;
+                        }
                     }
-                    Console.ReadKey();
                 }
             }
         }
     }        
 }
+ 

@@ -2,9 +2,9 @@
 
 namespace IngExportInlezen.Services
 {
-    public static class ConsoleServices
+    public static class INGSorteerServices
     {
-        public static decimal ResultatenEnOverigeKosten(List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
+        public static List<IngExport_Internal> ResultatenEnOverigeKosten(List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
         {
             foreach (string entry in resultList)
             {
@@ -40,10 +40,10 @@ namespace IngExportInlezen.Services
             {
                 Console.WriteLine($"Overige kosten post: {uniqueNaam.Naam} || {uniqueNaam.Bedrag}");
             }
-            return bedragRest;
+            return naamSumList;
         }
 
-        public static decimal Spaaropdrachten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static (List<IngExport_Internal> inleggenList, List<IngExport_Internal> opgenomenList) Spaaropdrachten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var inleggenSpaaropdrachtenList = new List<IngExport_Internal>();
             var opgenomenSpaaropdrachtenList = new List<IngExport_Internal>();
@@ -70,11 +70,11 @@ namespace IngExportInlezen.Services
             var netto = inleggenSpaaropdrachtenBedrag - opgenomenpaaropdrachtenBedrag;
             resultList.Add($"Het totale bedrag voor spaaropdrachten is: {inleggenSpaaropdrachtenBedrag}");
             resultList.Add($"De totale hoeveelheid opgenomen van spaarrekeningen is: {opgenomenpaaropdrachtenBedrag}");
-            resultList.Add($"Netto gespaard: {netto}");
-            return netto;
+            resultList.Add($"Netto gespaard: {netto}\n");
+            return (inleggenSpaaropdrachtenList, opgenomenSpaaropdrachtenList);
         }
 
-        public static decimal OverigeInkomsten(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static List<IngExport_Internal> OverigeInkomsten(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var overigeInkomstenList = new List<IngExport_Internal>();
 
@@ -91,10 +91,10 @@ namespace IngExportInlezen.Services
 
             var inkomstenBedrag = overigeInkomstenList.Sum(x => x.Bedrag);
             resultList.Add($"Overige inkomsten: {inkomstenBedrag}");
-            return inkomstenBedrag;
+            return overigeInkomstenList;
         }
 
-        public static decimal InkomstenSalaris(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static List<IngExport_Internal> InkomstenSalaris(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var salarisList = new List<IngExport_Internal>();
             foreach (var salaris in appSettings.InkomstenSalaris)
@@ -105,10 +105,10 @@ namespace IngExportInlezen.Services
             }
             var salarisBedrag = salarisList.Sum(x => x.Bedrag);
             resultList.Add($"Inkomsten salaris: {salarisBedrag}");
-            return salarisBedrag;
+            return salarisList;
         }
 
-        public static decimal Tanken(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static List<IngExport_Internal> Tanken(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var tankenList = new List<IngExport_Internal>();
             foreach (var tank in appSettings.Tanken)
@@ -120,10 +120,10 @@ namespace IngExportInlezen.Services
 
             var tankenBedrag = tankenList.Sum(x => x.Bedrag);
             resultList.Add($"Kosten tanken: {tankenBedrag}");
-            return tankenBedrag;
+            return tankenList;
         }
 
-        public static decimal GeldOpname(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
+        public static List<IngExport_Internal> GeldOpname(List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList, List<IngExport_Internal> unassignedEntries)
         {
             var geldOpnameList = new List<IngExport_Internal>();
 
@@ -134,10 +134,10 @@ namespace IngExportInlezen.Services
 
             var geldOpnameBedrag = geldOpnameList.Sum(x => x.Bedrag);
             resultList.Add($"Geld opnames: {geldOpnameBedrag}");
-            return geldOpnameBedrag;
+            return geldOpnameList;
         }
 
-        public static decimal Boodschappen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static List<IngExport_Internal> Boodschappen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var boodschappenList = new List<IngExport_Internal>();
             foreach (var winkel in appSettings.Boodschappen)
@@ -169,11 +169,11 @@ namespace IngExportInlezen.Services
             }
 
             var boodschappenBedrag = boodschappenList.Sum(x => x.Bedrag);
-            resultList.Add($"Kosten boodschappen: {boodschappenBedrag}");
-            return boodschappenBedrag;
+            resultList.Add($"Kosten boodschappen: {boodschappenBedrag}\n");
+            return boodschappenList;
         }
 
-        public static decimal VasteLasten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static List<IngExport_Internal> VasteLasten(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var vasteLastenList = new List<IngExport_Internal>();
             foreach (var last in appSettings.VasteLasten)
@@ -185,10 +185,10 @@ namespace IngExportInlezen.Services
 
             var vastenLastenBedrag = vasteLastenList.Sum(x => x.Bedrag);
             resultList.Add($"Kosten vaste lasten: {vastenLastenBedrag}");
-            return vastenLastenBedrag;
+            return vasteLastenList;
         }
 
-        public static decimal Abonnementen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
+        public static List<IngExport_Internal> Abonnementen(AppSettings appSettings, List<IngExport_Internal> completeCsvList, string laatsteDatum, string eersteDatum, List<string> resultList, List<IngExport_Internal> assignedLineList)
         {
             var abonnementenList = new List<IngExport_Internal>();
             foreach (var abonnement in appSettings.Abonnementen)
@@ -208,7 +208,7 @@ namespace IngExportInlezen.Services
 
             var abonnementenBedrag = abonnementenList.Sum(x => x.Bedrag);
             resultList.Add($"Kosten abonnementen: {abonnementenBedrag}");
-            return abonnementenBedrag;
+            return abonnementenList;
         }
     }
 }
