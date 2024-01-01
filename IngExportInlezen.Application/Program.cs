@@ -42,6 +42,7 @@ namespace IngExportInlezen.Application
             {
                 string csvInput = matchingFiles[0];
 
+                //Voor dramatisch effect :)
                 //Console.WriteLine("\nInlezen ING Export...\n");
 
                 //Task.Delay(1000).Wait();

@@ -26,14 +26,14 @@ namespace IngExportInlezen.Services
             using (ExcelPackage package = new ExcelPackage(existingFile))
             {
                 ExcelWorksheet abonnementen = package.Workbook.Worksheets[0];
-                ExcelWorksheet vasteLasten = package.Workbook.Worksheets[1];
-                ExcelWorksheet boodschappen = package.Workbook.Worksheets[2];
-                ExcelWorksheet geldOpnames = package.Workbook.Worksheets[3];
-                ExcelWorksheet tanken = package.Workbook.Worksheets[4];
-                ExcelWorksheet inkomstenSalaris = package.Workbook.Worksheets[5];
-                ExcelWorksheet overigeInkomsten = package.Workbook.Worksheets[6];
-                ExcelWorksheet spaarOpdrachten = package.Workbook.Worksheets[7];
-                ExcelWorksheet overigeKosten = package.Workbook.Worksheets[8];
+                ExcelWorksheet boodschappen = package.Workbook.Worksheets[1];
+                ExcelWorksheet geldOpnames = package.Workbook.Worksheets[2];
+                ExcelWorksheet inkomstenSalaris = package.Workbook.Worksheets[3];
+                ExcelWorksheet overigeInkomsten = package.Workbook.Worksheets[4];
+                ExcelWorksheet overigeKosten = package.Workbook.Worksheets[5];
+                ExcelWorksheet spaarOpdrachten = package.Workbook.Worksheets[6];
+                ExcelWorksheet tanken = package.Workbook.Worksheets[7];
+                ExcelWorksheet vasteLasten = package.Workbook.Worksheets[8];
 
                 package.Save();
             }
@@ -79,7 +79,10 @@ namespace IngExportInlezen.Services
 
                 //Maken van pie chart.
                 var existingPieChart = worksheetOverzicht.Drawings["SpreidingKosten"];
-                worksheetOverzicht.Drawings.Remove(existingPieChart);
+                if (existingPieChart != null)
+                {
+                    worksheetOverzicht.Drawings.Remove(existingPieChart);
+                };
                 var pieChart = worksheetOverzicht.Drawings.AddChart("SpreidingKosten", eChartType.Pie);
                 var serie = pieChart.Series.Add(worksheetOverzicht.Cells[rowNumber, 3, rowNumber, 8], worksheetOverzicht.Cells[2, 3, 2, 8]);
                 pieChart.SetPosition(1, 0, 12, 0);
@@ -100,7 +103,10 @@ namespace IngExportInlezen.Services
 
                 //Maken van doughnut chart.
                 var existingDoughnutChart = worksheetOverzicht.Drawings["MaandGoal"];
-                worksheetOverzicht.Drawings.Remove(existingDoughnutChart);
+                if (existingDoughnutChart != null )
+                {
+                    worksheetOverzicht.Drawings.Remove(existingDoughnutChart);
+                }
                 var doughnutChart = worksheetOverzicht.Drawings.AddChart("MaandGoal", eChartType.Doughnut);
                 doughnutChart.SetPosition(24, 0, 12, 0);
                 doughnutChart.SetSize(700, 450);
