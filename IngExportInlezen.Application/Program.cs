@@ -105,19 +105,48 @@ namespace IngExportInlezen.Application
                         SpaarOpdrachtenOpgenomen = opgenomenList
                     };
 
-                    var inputChecker = true;
+                    var inputActivity = true;
+                    var inputChecker = new List<string>();
                     Console.WriteLine("\nMaak een keuze \n" +
                             "Druk op 1 om de resultaten in een maandoverzicht in Excel te importen\n" +
                             "Druk op 2 om de resultaten in het jaaroverzicht in Excel te schrijven\n" +
                             "Druk op een knop om af te sluiten\n");
-                    while (inputChecker)
+                    while (inputActivity)
                     {
                         var input = Console.ReadKey().KeyChar.ToString();
 
                         switch (input)
                         {
                             case "1":
-                                try
+                                if (inputChecker.Contains(input))
+                                {
+                                    Console.WriteLine("\nOptie 1 is al eerder gekozen.\nDruk op Y om verder te gaan.\nDruk op N om te annuleren");
+                                    var question = Console.ReadKey().KeyChar.ToString();
+                                    Console.WriteLine("\n");
+                                    var questionChecker = true;
+                                    while (questionChecker)
+                                    {
+                                        if (question != "y" && question != "n")
+                                        {
+                                            Console.WriteLine("\nVoer een juiste input in: Y of N");
+                                            Console.WriteLine("\n");
+                                            question = Console.ReadKey().KeyChar.ToString();
+                                        }
+                                        if (question == "y" || question == "n")
+                                        {
+                                            questionChecker = false;
+                                        }
+
+                                    }
+                                    if (question.Equals("n"))
+                                    {
+                                        Console.WriteLine("\nDruk op 1 om de resultaten in een maandoverzicht in Excel te importen\n" +
+                                            "Druk op 2 om de resultaten in het jaaroverzicht in Excel te schrijven\n" +
+                                            "Druk op een knop om af te sluiten\n");
+                                        break;
+                                    }
+                                }
+                                    try
                                 {
                                     ExcelExporter.ExportToMaandExcel(excelExport);
                                 }
@@ -127,9 +156,41 @@ namespace IngExportInlezen.Application
                                     Console.ReadKey();
                                     throw;
                                 }
-                                Console.WriteLine("\nDe gegevens zijn succesvol in de Excel maandsheet geschreven!\n");
+                                Console.WriteLine("\nDe gegevens zijn succesvol in de Excel maandsheet geschreven!\n\n" +
+                                    "Druk op 1 om de resultaten in een maandoverzicht in Excel te importen\n" +
+                                    "Druk op 2 om de resultaten in het jaaroverzicht in Excel te schrijven\n" +
+                                    "Druk op een knop om af te sluiten\n");
+                                inputChecker.Add(input);
                                 break;
                             case "2":
+                                if (inputChecker.Contains(input))
+                                {
+                                    Console.WriteLine("\nOptie 2 is al eerder gekozen.\nDruk op Y om verder te gaan.\nDruk op N om te annuleren");
+                                    var question = Console.ReadKey().KeyChar.ToString();
+                                    Console.WriteLine("\n");
+                                    var questionChecker = true;
+                                    while (questionChecker)
+                                    {
+                                        if (question != "y" && question != "n")
+                                        {
+                                            Console.WriteLine("\nVoer een juiste input in: Y of N");
+                                            Console.WriteLine("\n");
+                                            question = Console.ReadKey().KeyChar.ToString();
+                                        }
+                                        if (question == "y" || question == "n")
+                                        {
+                                            questionChecker = false;
+                                        }
+
+                                    }
+                                    if (question.Equals("n"))
+                                    {
+                                        Console.WriteLine("\nDruk op 1 om de resultaten in een maandoverzicht in Excel te importen\n" +
+                                            "Druk op 2 om de resultaten in het jaaroverzicht in Excel te schrijven\n" +
+                                            "Druk op een knop om af te sluiten\n");
+                                        break;
+                                    }
+                                }
                                 try
                                 {
                                     ExcelExporter.ExportToJaaroverzichtExcel(excelExport);
@@ -140,10 +201,14 @@ namespace IngExportInlezen.Application
                                     Console.ReadKey();
                                     throw;
                                 }
-                                Console.WriteLine("\nDe gegevens zijn succesvol in de Excel jaarsheet geschreven!\n");
+                                Console.WriteLine("\nDe gegevens zijn succesvol in de Excel jaarsheet geschreven!\n\n" +
+                                    "Druk op 1 om de resultaten in een maandoverzicht in Excel te importen\n" +
+                                    "Druk op 2 om de resultaten in het jaaroverzicht in Excel te schrijven\n" +
+                                    "Druk op een knop om af te sluiten\n");
+                                inputChecker.Add(input);
                                 break;
                             default:
-                                inputChecker = false;
+                                inputActivity = false;
                                 break;
                         }
                     }
