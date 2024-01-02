@@ -1,11 +1,4 @@
-﻿using CsvHelper.Configuration.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IngExportInlezen.Domain
+﻿namespace IngExportInlezen.Domain
 {
     public class IngExport_Internal
     {
