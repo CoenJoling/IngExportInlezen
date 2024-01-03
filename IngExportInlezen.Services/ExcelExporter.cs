@@ -47,83 +47,83 @@ namespace IngExportInlezen.Services
                 var rowNumberTanken = tanken.Dimension.Rows + 2;
                 var rowNumberVasteLasten = vasteLasten.Dimension.Rows + 2;
 
-                //PopulateWorksheet(abonnementen, rowNumberAbonnementen, excelExport.Abonnementen, excelExport);
-                //PopulateWorksheet(boodschappen, rowNumberBoodschappen, excelExport.Boodschappen, excelExport);
-                //PopulateWorksheet(geldOpnames, rowNumberGeldOpnames, excelExport.GeldOpnames, excelExport);
-                //PopulateWorksheet(inkomstenSalaris, rowNumberInkomstenSalaris, excelExport.InkomstenSalaris, excelExport);
-                //PopulateWorksheet(overigeInkomsten, rowNumberOverigeInkomsten, excelExport.OverigeInkomsten, excelExport);
-                //PopulateWorksheet(tanken, rowNumberTanken, excelExport.Tanken, excelExport);
-                //PopulateWorksheet(vasteLasten, rowNumberVasteLasten, excelExport.VasteLasten, excelExport);
+                PopulateWorksheet(abonnementen, rowNumberAbonnementen, excelExport.Abonnementen, excelExport);
+                PopulateWorksheet(boodschappen, rowNumberBoodschappen, excelExport.Boodschappen, excelExport);
+                PopulateWorksheet(geldOpnames, rowNumberGeldOpnames, excelExport.GeldOpnames, excelExport);
+                PopulateWorksheet(inkomstenSalaris, rowNumberInkomstenSalaris, excelExport.InkomstenSalaris, excelExport);
+                PopulateWorksheet(overigeInkomsten, rowNumberOverigeInkomsten, excelExport.OverigeInkomsten, excelExport);
+                PopulateWorksheet(tanken, rowNumberTanken, excelExport.Tanken, excelExport);
+                PopulateWorksheet(vasteLasten, rowNumberVasteLasten, excelExport.VasteLasten, excelExport);
 
                 #region Overige kosten
-                //overigeKosten.Cells[rowNumberOverigeKosten, 2].Value = excelExport.Maand;
-                //var maandCellOk = overigeKosten.Cells[$"B{rowNumberOverigeKosten}:C{rowNumberOverigeKosten}"];
-                //maandCellOk.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //maandCellOk.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //maandCellOk.Style.Font.Bold = true;
+                overigeKosten.Cells[rowNumberOverigeKosten, 2].Value = excelExport.Maand;
+                var maandCellOk = overigeKosten.Cells[$"B{rowNumberOverigeKosten}:C{rowNumberOverigeKosten}"];
+                maandCellOk.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                maandCellOk.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                maandCellOk.Style.Font.Bold = true;
 
-                //for (var i = 0; i < excelExport.OverigeKosten.Count(); i++)
-                //{
-                //    var entry = excelExport.OverigeKosten[i];
-                //    overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 2].Value = entry.Naam;
-                //    overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 3].Value = entry.Bedrag;
+                for (var i = 0; i < excelExport.OverigeKosten.Count(); i++)
+                {
+                    var entry = excelExport.OverigeKosten[i];
+                    overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 2].Value = entry.Naam;
+                    overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 3].Value = entry.Bedrag;
 
-                //    var range = overigeKosten.Cells[$"B{rowNumberOverigeKosten + i + 1}:C{rowNumberOverigeKosten + i + 1}"];
-                //    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //}
+                    var range = overigeKosten.Cells[$"B{rowNumberOverigeKosten + i + 1}:C{rowNumberOverigeKosten + i + 1}"];
+                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                }
                 #endregion
 
                 #region Spaaropdrachten
-                //excelExport.SpaarOpdrachtenIngelegd = excelExport.SpaarOpdrachtenIngelegd.OrderBy(x => x.Datum).ToList();
-                //excelExport.SpaarOpdrachtenOpgenomen = excelExport.SpaarOpdrachtenOpgenomen.OrderBy(x => x.Datum).ToList();
-                //spaarOpdrachten.Cells[rowNumberSpaarOpdrachten, 2].Value = excelExport.Maand;
-                //var maandCellSo = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten}:F{rowNumberSpaarOpdrachten}"];
-                //maandCellSo.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //maandCellSo.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //maandCellSo.Style.Font.Bold = true;
+                excelExport.SpaarOpdrachtenIngelegd = excelExport.SpaarOpdrachtenIngelegd.OrderBy(x => x.Datum).ToList();
+                excelExport.SpaarOpdrachtenOpgenomen = excelExport.SpaarOpdrachtenOpgenomen.OrderBy(x => x.Datum).ToList();
+                spaarOpdrachten.Cells[rowNumberSpaarOpdrachten, 2].Value = excelExport.Maand;
+                var maandCellSo = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten}:F{rowNumberSpaarOpdrachten}"];
+                maandCellSo.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                maandCellSo.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                maandCellSo.Style.Font.Bold = true;
 
-                //rowNumberSpaarOpdrachten = spaarOpdrachten.Dimension.Rows + 2;
-                //spaarOpdrachten.Cells[rowNumberSpaarOpdrachten, 2].Value = "Spaaropdrachten ingelegd";
-                //var inlegCellSo = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten}:F{rowNumberSpaarOpdrachten}"];
-                //inlegCellSo.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //inlegCellSo.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //inlegCellSo.Style.Font.Bold = true;
+                rowNumberSpaarOpdrachten = spaarOpdrachten.Dimension.Rows + 2;
+                spaarOpdrachten.Cells[rowNumberSpaarOpdrachten, 2].Value = "Spaaropdrachten ingelegd";
+                var inlegCellSo = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten}:F{rowNumberSpaarOpdrachten}"];
+                inlegCellSo.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                inlegCellSo.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                inlegCellSo.Style.Font.Bold = true;
 
-                //for (var i = 0; i < excelExport.SpaarOpdrachtenIngelegd.Count(); i++)
-                //{
-                //    var entry = excelExport.SpaarOpdrachtenIngelegd[i];
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 2].Value = entry.Datum.ToString("dd MMMM yyyy");
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 3].Value = entry.Naam;
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 4].Value = entry.Code;
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 5].Value = entry.Bedrag;
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 6].Value = entry.Mededelingen;
+                for (var i = 0; i < excelExport.SpaarOpdrachtenIngelegd.Count(); i++)
+                {
+                    var entry = excelExport.SpaarOpdrachtenIngelegd[i];
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 2].Value = entry.Datum.ToString("dd MMMM yyyy");
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 3].Value = entry.Naam;
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 4].Value = entry.Code;
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 5].Value = entry.Bedrag;
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 6].Value = entry.Mededelingen;
 
-                //    var range = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten + i + 1}:F{rowNumberSpaarOpdrachten + i + 1}"];
-                //    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //}
+                    var range = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten + i + 1}:F{rowNumberSpaarOpdrachten + i + 1}"];
+                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                }
 
-                //rowNumberSpaarOpdrachten = spaarOpdrachten.Dimension.Rows + 2;
-                //spaarOpdrachten.Cells[rowNumberSpaarOpdrachten, 2].Value = "Spaaropdrachten opgenomen";
-                //var opnameCellSo = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten}:F{rowNumberSpaarOpdrachten}"];
-                //opnameCellSo.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //opnameCellSo.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //opnameCellSo.Style.Font.Bold = true;
+                rowNumberSpaarOpdrachten = spaarOpdrachten.Dimension.Rows + 2;
+                spaarOpdrachten.Cells[rowNumberSpaarOpdrachten, 2].Value = "Spaaropdrachten opgenomen";
+                var opnameCellSo = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten}:F{rowNumberSpaarOpdrachten}"];
+                opnameCellSo.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                opnameCellSo.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                opnameCellSo.Style.Font.Bold = true;
 
-                //for (var i = 0; i < excelExport.SpaarOpdrachtenOpgenomen.Count(); i++)
-                //{
-                //    var entry = excelExport.SpaarOpdrachtenOpgenomen[i];
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 2].Value = entry.Datum.ToString("dd MMMM yyyy");
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 3].Value = entry.Naam;
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 4].Value = entry.Code;
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 5].Value = entry.Bedrag * -1;
-                //    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 6].Value = entry.Mededelingen;
+                for (var i = 0; i < excelExport.SpaarOpdrachtenOpgenomen.Count(); i++)
+                {
+                    var entry = excelExport.SpaarOpdrachtenOpgenomen[i];
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 2].Value = entry.Datum.ToString("dd MMMM yyyy");
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 3].Value = entry.Naam;
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 4].Value = entry.Code;
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 5].Value = entry.Bedrag * -1;
+                    spaarOpdrachten.Cells[rowNumberSpaarOpdrachten + i + 1, 6].Value = entry.Mededelingen;
 
-                //    var range = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten + i + 1}:F{rowNumberSpaarOpdrachten + i + 1}"];
-                //    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //}
+                    var range = spaarOpdrachten.Cells[$"B{rowNumberSpaarOpdrachten + i + 1}:F{rowNumberSpaarOpdrachten + i + 1}"];
+                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                }
                 #endregion
 
                 #region Overzicht
