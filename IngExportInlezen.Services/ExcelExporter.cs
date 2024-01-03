@@ -127,27 +127,39 @@ namespace IngExportInlezen.Services
                 #endregion
 
                 #region Overzicht
-                //for (var i = 2; i < 29; i += 3)
-                //{
-                //    overzicht.Cells[rowNumberOverzicht, i].Value = excelExport.Maand;
-                //}
+                for (var i = 2; i < 29; i += 3)
+                {
+                    overzicht.Cells[rowNumberOverzicht, i].Value = excelExport.Maand;
+                }
 
-                //PopulateOverzicht(overzicht, 3, rowNumberOverzicht, excelExport.Abonnementen);
-                //PopulateOverzicht(overzicht, 6, rowNumberOverzicht, excelExport.Boodschappen);
-                //PopulateOverzicht(overzicht, 9, rowNumberOverzicht, excelExport.GeldOpnames);
-                //PopulateOverzicht(overzicht, 12, rowNumberOverzicht, excelExport.InkomstenSalaris);
-                //PopulateOverzicht(overzicht, 15, rowNumberOverzicht, excelExport.OverigeInkomsten);
-                //PopulateOverzicht(overzicht, 18, rowNumberOverzicht, excelExport.OverigeKosten);
-                //var spaarBedrag = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
-                //overzicht.Cells[rowNumberOverzicht, 21].Value = spaarBedrag;
-                //var cell1 = overzicht.Cells[rowNumberOverzicht, 20];
-                //cell1.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //cell1.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //var cell2 = overzicht.Cells[rowNumberOverzicht, 21];
-                //cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                //cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
-                //PopulateOverzicht(overzicht, 24, rowNumberOverzicht, excelExport.Tanken);
-                //PopulateOverzicht(overzicht, 27, rowNumberOverzicht, excelExport.VasteLasten);
+                PopulateOverzicht(overzicht, 3, rowNumberOverzicht, excelExport.Abonnementen);
+                PopulateOverzicht(overzicht, 6, rowNumberOverzicht, excelExport.Boodschappen);
+                PopulateOverzicht(overzicht, 9, rowNumberOverzicht, excelExport.GeldOpnames);
+                PopulateOverzicht(overzicht, 12, rowNumberOverzicht, excelExport.InkomstenSalaris);
+                PopulateOverzicht(overzicht, 15, rowNumberOverzicht, excelExport.OverigeInkomsten);
+                PopulateOverzicht(overzicht, 18, rowNumberOverzicht, excelExport.OverigeKosten);
+                var spaarBedrag = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
+                overzicht.Cells[rowNumberOverzicht, 21].Value = spaarBedrag;
+                var cell1 = overzicht.Cells[rowNumberOverzicht, 20];
+                cell1.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                cell1.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                var cell2 = overzicht.Cells[rowNumberOverzicht, 21];
+                cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                PopulateOverzicht(overzicht, 24, rowNumberOverzicht, excelExport.Tanken);
+                PopulateOverzicht(overzicht, 27, rowNumberOverzicht, excelExport.VasteLasten);
+
+                overzicht.Cells["C3"].Formula = $"SUM(C5:C{rowNumberOverzicht})";
+                overzicht.Cells["F3"].Formula = $"SUM(F5:F{rowNumberOverzicht})";
+                overzicht.Cells["I3"].Formula = $"SUM(I5:I{rowNumberOverzicht})";
+                overzicht.Cells["L3"].Formula = $"SUM(L5:L{rowNumberOverzicht})";
+                overzicht.Cells["O3"].Formula = $"SUM(O5:O{rowNumberOverzicht})";
+                overzicht.Cells["R3"].Formula = $"SUM(R5:R{rowNumberOverzicht})";
+                overzicht.Cells["U3"].Formula = $"SUM(U5:U{rowNumberOverzicht})";
+                overzicht.Cells["X3"].Formula = $"SUM(X5:X{rowNumberOverzicht})";
+                overzicht.Cells["AA3"].Formula = $"SUM(AA5:AA{rowNumberOverzicht})";
+                overzicht.Calculate();
+
                 #endregion
 
                 package.Save();
