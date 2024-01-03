@@ -168,20 +168,20 @@ namespace IngExportInlezen.Services
             using (ExcelPackage package = new ExcelPackage(existingFile))
             {
                 ExcelWorksheet worksheetOverzicht = package.Workbook.Worksheets[0];
-                ExcelWorksheet worksheetGrafieken = package.Workbook.Worksheets[2];
+                ExcelWorksheet worksheetGrafieken = package.Workbook.Worksheets[1];
 
                 var rowNumber = worksheetOverzicht.Dimension.Rows + 2;
 
                 worksheetOverzicht.Cells[rowNumber, 2].Value = excelExport.Maand;
                 worksheetOverzicht.Cells[rowNumber, 3].Value = excelExport.VasteLasten.Sum(x => x.Bedrag);
                 worksheetOverzicht.Cells[rowNumber, 4].Value = excelExport.Abonnementen.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 5].Value = excelExport.Boodschappen.Sum(x => x.Bedrag);
+                worksheetOverzicht.Cells[rowNumber, 5].Value = excelExport.Tanken.Sum(x => x.Bedrag);
                 worksheetOverzicht.Cells[rowNumber, 6].Value = excelExport.GeldOpnames.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 7].Value = excelExport.Tanken.Sum(x => x.Bedrag);
+                worksheetOverzicht.Cells[rowNumber, 7].Value = excelExport.Boodschappen.Sum(x => x.Bedrag);
                 worksheetOverzicht.Cells[rowNumber, 8].Value = excelExport.OverigeKosten.Sum(x => x.Bedrag) * -1;
-                worksheetOverzicht.Cells[rowNumber, 9].Value = excelExport.InkomstenSalaris.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 10].Value = excelExport.OverigeInkomsten.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 11].Value = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
+                worksheetOverzicht.Cells[rowNumber, 9].Value = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
+                worksheetOverzicht.Cells[rowNumber, 10].Value = excelExport.InkomstenSalaris.Sum(x => x.Bedrag);
+                worksheetOverzicht.Cells[rowNumber, 11].Value = excelExport.OverigeInkomsten.Sum(x => x.Bedrag);
 
                 //Nieuwe regel opmaak
                 var range = worksheetOverzicht.Cells[$"B{rowNumber}:K{rowNumber}"];
@@ -200,13 +200,13 @@ namespace IngExportInlezen.Services
                 };
                 var pieChart = worksheetOverzicht.Drawings.AddChart("SpreidingKosten", eChartType.Pie);
                 var serie = pieChart.Series.Add(worksheetOverzicht.Cells[rowNumber, 3, rowNumber, 8], worksheetOverzicht.Cells[2, 3, 2, 8]);
-                pieChart.SetPosition(1, 0, 12, 0);
-                pieChart.SetSize(700, 450);
+                pieChart.SetPosition(rowNumber + 1, 0, 1, 0);
+                pieChart.SetSize(650, 450);
                 pieChart.Title.Text = $"Spreiding kosten {excelExport.Maand}";
                 pieChart.Title.Font.Bold = true;
                 pieChart.Title.Font.Size = 16;
                 pieChart.Legend.Position = eLegendPosition.Left;
-                pieChart.Legend.Font.Size = 16;
+                pieChart.Legend.Font.Size = 13;
                 var pieSerie = (ExcelPieChartSerie)serie;
                 pieSerie.DataLabel.ShowCategory = true;
                 pieSerie.DataLabel.ShowPercent = true;
@@ -214,21 +214,44 @@ namespace IngExportInlezen.Services
                 pieSerie.DataLabel.Position = eLabelPosition.OutEnd;
                 pieChart.Fill.Style = eFillStyle.SolidFill;
                 pieChart.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
-                
-                //Maken van doughnut chart.
-                var existingDoughnutChart = worksheetOverzicht.Drawings["MaandGoal"];
-                if (existingDoughnutChart != null )
+
+
+                // Maken van bugdget chart.
+                var budgetChart = worksheetOverzicht.Drawings["Budget"];
+                if (budgetChart != null)
                 {
-                    worksheetOverzicht.Drawings.Remove(existingDoughnutChart);
+                    worksheetOverzicht.Drawings.Remove(budgetChart);
                 }
-                var doughnutChart = worksheetOverzicht.Drawings.AddChart("MaandGoal", eChartType.Doughnut);
-                doughnutChart.SetPosition(24, 0, 12, 0);
-                doughnutChart.SetSize(700, 450);
-                doughnutChart.Series.Add(worksheetGrafieken.Cells["C4:C5"], worksheetGrafieken.Cells["C4:C5"]);
-                doughnutChart.Fill.Style = eFillStyle.SolidFill;
-                doughnutChart.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+                var columnChart = worksheetOverzicht.Drawings.AddChart("Budget", eChartType.ColumnClustered);
+                columnChart.SetPosition(rowNumber + 1, 0, 8, 0);
+                columnChart.SetSize(650, 450);
+                var serie1 = columnChart.Series.Add("G3:I3", "G2:I2");
+                var serie2 = columnChart.Series.Add($"G{rowNumber}:I{rowNumber}", "G2:I2");
+                columnChart.Legend.Remove();
+                columnChart.YAxis.MinorTickMark = eAxisTickMark.None;
+                columnChart.PlotArea.Fill.Style = eFillStyle.SolidFill;
+                columnChart.PlotArea.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+                columnChart.Fill.Style = eFillStyle.SolidFill;
+                columnChart.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+                columnChart.Title.Text = $"Budget vs werkelijkheid {excelExport.Maand}";
+                columnChart.Title.Font.Bold = true;
+                columnChart.Title.Font.Size = 16;
 
+                var cellG3 = Convert.ToDecimal(worksheetOverzicht.Cells["G3"].Value);
+                var cellH3 = Convert.ToDecimal(worksheetOverzicht.Cells["H3"].Value);
+                var cellI3 = Convert.ToDecimal(worksheetOverzicht.Cells["I3"].Value);
+                var newCellG = Convert.ToDecimal(worksheetOverzicht.Cells[$"G{rowNumber}"].Value);
+                var newCellH = Convert.ToDecimal(worksheetOverzicht.Cells[$"H{rowNumber}"].Value);
+                var newCellI = Convert.ToDecimal(worksheetOverzicht.Cells[$"I{rowNumber}"].Value);
 
+                if (cellG3 < newCellG || cellH3 < newCellH || cellI3 > newCellI)
+                {
+                    columnChart.Series[1].Fill.Color = System.Drawing.Color.FromArgb(255, 0, 0);
+                }
+                else
+                {
+                    columnChart.Series[1].Fill.Color = System.Drawing.Color.FromArgb(0, 255, 0);
+                }
 
                 //Diagrammen grafieken worksheet
                 //var diagram1 = worksheetGrafieken.Drawings["Chart 1"] as ExcelChart;
@@ -240,7 +263,7 @@ namespace IngExportInlezen.Services
                 //serieInkomsten.HeaderAddress = worksheetGrafieken.Cells[rowNumber, 1];
                 //diagramInkomsten.SetPosition(44, 0, 11, 0);
 
-                //foreach (var drawing in worksheetGrafieken.Drawings)
+                //foreach (var drawing in worksheetOverzicht.Drawings)
                 //{
                 //    if (drawing is ExcelChart)
                 //    {
@@ -265,17 +288,15 @@ namespace IngExportInlezen.Services
                 //    Console.WriteLine($"Size: {drawing.To.Column - drawing.From.Column}, {drawing.To.Row - drawing.From.Row}");
                 //    Console.WriteLine();
                 //}
-
                 package.Save();
             }
         }
-
         private static void PopulateOverzicht(ExcelWorksheet worksheet, int columnNumber, int rowNumberOverzicht, List<IngExport_Internal> data)
         {
             var sumBedrag = data.Sum(x => x.Bedrag);
             worksheet.Cells[rowNumberOverzicht, columnNumber].Value = sumBedrag;
 
-            var cell1 = worksheet.Cells[rowNumberOverzicht, columnNumber-1];
+            var cell1 = worksheet.Cells[rowNumberOverzicht, columnNumber - 1];
             cell1.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
             cell1.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
 
