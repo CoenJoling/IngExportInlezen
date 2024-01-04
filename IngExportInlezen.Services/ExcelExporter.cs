@@ -326,7 +326,7 @@ namespace IngExportInlezen.Services
             cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
             if ((double)sumBedrag > com)
             {
-                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 255, 102));
+                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 196, 94));
             }
             else
             {
