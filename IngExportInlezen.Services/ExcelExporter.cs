@@ -328,7 +328,10 @@ namespace IngExportInlezen.Services
             {
                 cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 255, 102));
             }
-            cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+            else
+            {
+                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+            }
         }
 
         private static double StdDev(List<double> values, double average)
