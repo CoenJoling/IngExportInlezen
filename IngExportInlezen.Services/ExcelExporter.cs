@@ -308,14 +308,37 @@ namespace IngExportInlezen.Services
             var sumBedrag = data.Sum(x => x.Bedrag);
             worksheet.Cells[rowNumberOverzicht, columnNumber].Value = sumBedrag;
 
+            var cellValues = new List<double>();
+            var cells = worksheet.Cells[5, columnNumber,rowNumberOverzicht,columnNumber];
+            foreach (var cell in cells)
+            {
+                cellValues.Add(Convert.ToDouble(cell.Value));
+            }
+            var average = cellValues.Average();
+            var stDev = StdDev(cellValues, average);
+            var com = average + stDev;
+
             var cell1 = worksheet.Cells[rowNumberOverzicht, columnNumber - 1];
             cell1.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
             cell1.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
 
             var cell2 = worksheet.Cells[rowNumberOverzicht, columnNumber];
             cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            if ((double)sumBedrag > com)
+            {
+                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 255, 102));
+            }
             cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
         }
+
+        private static double StdDev(List<double> values, double average)
+        {
+            var sumOfSquares = values.Select(val => Math.Pow(val - average, 2)).Sum();
+            var variance = sumOfSquares / values.Count;
+            var standardDeviation = Math.Sqrt(variance);
+            return standardDeviation;
+        }
+
         private static void PopulateWorksheet(ExcelWorksheet worksheet, int rowNumber, List<IngExport_Internal> data, ExcelExport maand)
         {
             data = data.OrderBy(x => x.Datum).ToList();
