@@ -114,6 +114,7 @@ namespace IngExportInlezen.Application
                     while (inputActivity)
                     {
                         var input = Console.ReadKey().KeyChar.ToString();
+                        Console.WriteLine("\n");
 
                         switch (input)
                         {
@@ -131,6 +132,7 @@ namespace IngExportInlezen.Application
                                             Console.WriteLine("\nVoer een juiste input in: Y of N");
                                             Console.WriteLine("\n");
                                             question = Console.ReadKey().KeyChar.ToString();
+                                            Console.WriteLine("\n");
                                         }
                                         if (question == "y" || question == "n")
                                         {
@@ -154,6 +156,7 @@ namespace IngExportInlezen.Application
                                 {
                                     Console.WriteLine(ex.Message);
                                     Console.ReadKey();
+                                    Console.WriteLine("\n");
                                     throw;
                                 }
                                 Console.WriteLine("\nDe gegevens zijn succesvol in de Excel maandsheet geschreven!\n\n" +
@@ -162,7 +165,7 @@ namespace IngExportInlezen.Application
                                     "Druk op een knop om af te sluiten\n");
                                 inputChecker.Add(input);
                                 break;
-                            case "2":
+                            //case "2":
                                 if (inputChecker.Contains(input))
                                 {
                                     Console.WriteLine("\nOptie 2 is al eerder gekozen.\nDruk op Y om verder te gaan.\nDruk op N om te annuleren");
@@ -176,6 +179,7 @@ namespace IngExportInlezen.Application
                                             Console.WriteLine("\nVoer een juiste input in: Y of N");
                                             Console.WriteLine("\n");
                                             question = Console.ReadKey().KeyChar.ToString();
+                                            Console.WriteLine("\n");
                                         }
                                         if (question == "y" || question == "n")
                                         {
@@ -199,6 +203,7 @@ namespace IngExportInlezen.Application
                                 {
                                     Console.WriteLine(ex.Message);
                                     Console.ReadKey();
+                                    Console.WriteLine("\n");
                                     throw;
                                 }
                                 Console.WriteLine("\nDe gegevens zijn succesvol in de Excel jaarsheet geschreven!\n\n" +

@@ -7,6 +7,8 @@ namespace IngExportInlezen.Services
 {
     public static class ExcelExporter
     {
+        private static readonly Random rnd = new Random();
+
         static ExcelExporter()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -180,7 +182,8 @@ namespace IngExportInlezen.Services
             using (ExcelPackage package = new ExcelPackage(existingFile))
             {
                 ExcelWorksheet worksheetOverzicht = package.Workbook.Worksheets[0];
-                ExcelWorksheet worksheetGrafieken = package.Workbook.Worksheets[1];
+                ExcelWorksheet worksheetPieCharts = package.Workbook.Worksheets[1];
+                ExcelWorksheet worksheetBarCharts = package.Workbook.Worksheets[2];
 
                 var rowNumber = worksheetOverzicht.Dimension.Rows + 2;
 
@@ -249,6 +252,56 @@ namespace IngExportInlezen.Services
                 columnChart.Title.Font.Bold = true;
                 columnChart.Title.Font.Size = 16;
 
+                //Maken en behouden piechart in worksheetPieCharts
+                var row = 1;
+                var col = 1;
+                for (var i = 0; worksheetPieCharts.Drawings.Count >= i; i++)
+                {
+                    if (!IsChartPresentAtCell(worksheetPieCharts, row, col))
+                    {
+                        var pieChart2 = worksheetPieCharts.Drawings.AddChart($"SpreidingKosten{rnd.Next(100000)}", eChartType.Pie);
+                        var seriee = pieChart2.Series.Add(worksheetOverzicht.Cells[rowNumber, 3, rowNumber, 8], worksheetOverzicht.Cells[2, 3, 2, 8]);
+                        pieChart2.SetPosition(row, 0, col, 0);
+                        pieChart2.SetSize(630, 400);
+                        pieChart2.Title.Text = $"Spreiding kosten {excelExport.Maand}";
+                        pieChart2.Title.Font.Bold = true;
+                        pieChart2.Title.Font.Size = 16;
+                        pieChart2.Legend.Position = eLegendPosition.Left;
+                        pieChart2.Legend.Font.Size = 11;
+                        var pieSerie2 = (ExcelPieChartSerie)seriee;
+                        pieSerie2.DataLabel.ShowCategory = true;
+                        pieSerie2.DataLabel.ShowPercent = true;
+                        pieSerie2.DataLabel.ShowLeaderLines = true;
+                        pieSerie2.DataLabel.Position = eLabelPosition.OutEnd;
+                        pieChart2.Fill.Style = eFillStyle.SolidFill;
+                        pieChart2.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+                        break;
+                    }
+                    col +=11;
+                    if (!IsChartPresentAtCell(worksheetPieCharts, row, col))
+                    {
+                        var pieChart2 = worksheetPieCharts.Drawings.AddChart($"SpreidingKosten{rnd.Next(100000)}", eChartType.Pie);
+                        var seriee = pieChart2.Series.Add(worksheetOverzicht.Cells[rowNumber, 3, rowNumber, 8], worksheetOverzicht.Cells[2, 3, 2, 8]);
+                        pieChart2.SetPosition(row, 0, col, 0);
+                        pieChart2.SetSize(630, 400);
+                        pieChart2.Title.Text = $"Spreiding kosten {excelExport.Maand}";
+                        pieChart2.Title.Font.Bold = true;
+                        pieChart2.Title.Font.Size = 16;
+                        pieChart2.Legend.Position = eLegendPosition.Left;
+                        pieChart2.Legend.Font.Size = 11;
+                        var pieSerie2 = (ExcelPieChartSerie)seriee;
+                        pieSerie2.DataLabel.ShowCategory = true;
+                        pieSerie2.DataLabel.ShowPercent = true;
+                        pieSerie2.DataLabel.ShowLeaderLines = true;
+                        pieSerie2.DataLabel.Position = eLabelPosition.OutEnd;
+                        pieChart2.Fill.Style = eFillStyle.SolidFill;
+                        pieChart2.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+                        break;
+                    }
+                    row += 21;
+                    col -= 11;
+                }
+
                 var cellG3 = Convert.ToDecimal(worksheetOverzicht.Cells["G3"].Value);
                 var cellH3 = Convert.ToDecimal(worksheetOverzicht.Cells["H3"].Value);
                 var cellI3 = Convert.ToDecimal(worksheetOverzicht.Cells["I3"].Value);
@@ -275,34 +328,54 @@ namespace IngExportInlezen.Services
                 //serieInkomsten.HeaderAddress = worksheetGrafieken.Cells[rowNumber, 1];
                 //diagramInkomsten.SetPosition(44, 0, 11, 0);
 
-                //foreach (var drawing in worksheetOverzicht.Drawings)
-                //{
-                //    if (drawing is ExcelChart)
-                //    {
-                //        // Handle chart-specific logic
-                //        var chart = (ExcelChart)drawing;
-                //        Console.WriteLine($"Chart Name: {chart.Name}");
-                //        // Add more chart-specific logic as needed
-                //    }
-                //    else if (drawing is ExcelPicture)
-                //    {
-                //        // Handle picture-specific logic
-                //        var picture = (ExcelPicture)drawing;
-                //        Console.WriteLine($"Picture Name: {picture.Name}");
-                //        // Add more picture-specific logic as needed
-                //    }
-                //    // Add more conditions for other types of drawings (e.g., shapes)
+                foreach (var drawing in worksheetBarCharts.Drawings)
+                {
+                    if (drawing is ExcelChart)
+                    {
+                        // Handle chart-specific logic
+                        var chart = (ExcelChart)drawing;
+                        Console.WriteLine($"Chart Name: {chart.Name}");
+                        // Add more chart-specific logic as needed
+                    }
+                    else if (drawing is ExcelPicture)
+                    {
+                        // Handle picture-specific logic
+                        var picture = (ExcelPicture)drawing;
+                        Console.WriteLine($"Picture Name: {picture.Name}");
+                        // Add more picture-specific logic as needed
+                    }
+                    // Add more conditions for other types of drawings (e.g., shapes)
 
-                //    // Common properties for all drawings
-                //    Console.WriteLine($"Drawing Type: {drawing.GetType().Name}");
-                //    Console.WriteLine($"Description: {drawing.Description}");
-                //    Console.WriteLine($"Position: {drawing.From.Column}, {drawing.From.Row}");
-                //    Console.WriteLine($"Size: {drawing.To.Column - drawing.From.Column}, {drawing.To.Row - drawing.From.Row}");
-                //    Console.WriteLine();
-                //}
+                    // Common properties for all drawings
+                    Console.WriteLine($"Drawing Type: {drawing.GetType().Name}");
+                    Console.WriteLine($"Description: {drawing.Description}");
+                    Console.WriteLine($"Position: {drawing.From.Column}, {drawing.From.Row}");
+                    Console.WriteLine($"Size: {drawing.To.Column - drawing.From.Column}, {drawing.To.Row - drawing.From.Row}");
+                    Console.WriteLine();
+
+                }
                 package.Save();
             }
         }
+
+        private static bool IsChartPresentAtCell(ExcelWorksheet worksheet, int targetRow, int targetColumn)
+        {
+            foreach (var drawing in worksheet.Drawings)
+            {
+                if (drawing is ExcelChart chart)
+                {
+                    // Check if the chart position matches the target cell
+                    if (chart.From.Row <= targetRow && chart.To.Row >= targetRow &&
+                        chart.From.Column <= targetColumn && chart.To.Column >= targetColumn)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private static void PopulateOverzicht(ExcelWorksheet worksheet, int columnNumber, int rowNumberOverzicht, List<IngExport_Internal> data)
         {
             var sumBedrag = data.Sum(x => x.Bedrag);
