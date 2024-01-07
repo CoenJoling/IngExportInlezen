@@ -165,7 +165,7 @@ namespace IngExportInlezen.Application
                                     "Druk op een knop om af te sluiten\n");
                                 inputChecker.Add(input);
                                 break;
-                            //case "2":
+                            case "2":
                                 if (inputChecker.Contains(input))
                                 {
                                     Console.WriteLine("\nOptie 2 is al eerder gekozen.\nDruk op Y om verder te gaan.\nDruk op N om te annuleren");
@@ -197,7 +197,7 @@ namespace IngExportInlezen.Application
                                 }
                                 try
                                 {
-                                    ExcelExporter.ExportToJaaroverzichtExcel(excelExport);
+                                    ExcelExporter.ExportToJaaroverzichtExcel(excelExport, appSettings);
                                 }
                                 catch (Exception ex)
                                 {

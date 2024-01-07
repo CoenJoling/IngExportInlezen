@@ -1,4 +1,5 @@
 ﻿using IngExportInlezen.Domain;
+using Microsoft.Extensions.Configuration;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -14,7 +15,7 @@ namespace IngExportInlezen.Services
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        public static void ExportToJaaroverzichtExcel(ExcelExport excelExport)
+        public static void ExportToJaaroverzichtExcel(ExcelExport excelExport, AppSettings appSettings)
         {
             string filePath = @"C:\Users\coenj\Documents\Financieel overzicht\ING export\Jaarlijks Financieel Overzicht.xlsx";
 
@@ -139,7 +140,7 @@ namespace IngExportInlezen.Services
                 PopulateOverzicht(overzicht, 9, rowNumberOverzicht, excelExport.GeldOpnames);
                 PopulateOverzicht(overzicht, 12, rowNumberOverzicht, excelExport.InkomstenSalaris);
                 PopulateOverzicht(overzicht, 15, rowNumberOverzicht, excelExport.OverigeInkomsten);
-                PopulateOverzicht(overzicht, 18, rowNumberOverzicht, excelExport.OverigeKosten);
+                PopulateOverzicht(overzicht, 18, rowNumberOverzicht, excelExport.OverigeKosten, true);
                 var spaarBedrag = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
                 overzicht.Cells[rowNumberOverzicht, 21].Value = spaarBedrag;
                 var cell1 = overzicht.Cells[rowNumberOverzicht, 20];
@@ -148,6 +149,14 @@ namespace IngExportInlezen.Services
                 var cell2 = overzicht.Cells[rowNumberOverzicht, 21];
                 cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                 cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                if ((double)spaarBedrag < appSettings.Spaardoel)
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                }
+                else
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                }
                 PopulateOverzicht(overzicht, 24, rowNumberOverzicht, excelExport.Tanken);
                 PopulateOverzicht(overzicht, 27, rowNumberOverzicht, excelExport.VasteLasten);
 
@@ -319,43 +328,42 @@ namespace IngExportInlezen.Services
                 }
 
                 //Diagrammen grafieken worksheet
-                //var diagram1 = worksheetGrafieken.Drawings["Chart 1"] as ExcelChart;
-                //var serieKosten = diagram1.Series.Add(worksheetGrafieken.Cells[rowNumber, 4, rowNumber, 4], worksheetGrafieken.Cells[rowNumber, 4]);
-                //serieKosten.HeaderAddress = worksheetGrafieken.Cells[rowNumber, 1];
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Abonnementen", $"D4:D{rowNumber}", $"B4:B{rowNumber}", 1, 1);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Vaste lasten", $"C4:C{rowNumber}", $"B4:B{rowNumber}", 1, 12);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Tanken", $"E4:E{rowNumber}", $"B4:B{rowNumber}", 22, 1);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Geld opname", $"F4:F{rowNumber}", $"B4:B{rowNumber}", 22, 12);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Boodschappen", $"G4:G{rowNumber}", $"B4:B{rowNumber}", 43, 1);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Spaaropdrachten", $"I4:I{rowNumber}", $"B4:B{rowNumber}", 43, 12);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Inkomsten salaris", $"J4:J{rowNumber}", $"B4:B{rowNumber}", 64, 1);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Overige inkomsten", $"K4:K{rowNumber}", $"B4:B{rowNumber}", 64, 12);
+                MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Overige kosten", $"H4:H{rowNumber}", $"B4:B{rowNumber}", 85, 1);
 
-                //var diagram2 = worksheetGrafieken.Drawings["Chart 10"] as ExcelChart;
-                //var serieInkomsten = diagram2.Series.Add(worksheetGrafieken.Cells[rowNumber, 8, rowNumber, 10], worksheetGrafieken.Cells[rowNumber, 1]);
-                //serieInkomsten.HeaderAddress = worksheetGrafieken.Cells[rowNumber, 1];
-                //diagramInkomsten.SetPosition(44, 0, 11, 0);
-
-                foreach (var drawing in worksheetBarCharts.Drawings)
-                {
-                    if (drawing is ExcelChart)
-                    {
-                        // Handle chart-specific logic
-                        var chart = (ExcelChart)drawing;
-                        Console.WriteLine($"Chart Name: {chart.Name}");
-                        // Add more chart-specific logic as needed
-                    }
-                    else if (drawing is ExcelPicture)
-                    {
-                        // Handle picture-specific logic
-                        var picture = (ExcelPicture)drawing;
-                        Console.WriteLine($"Picture Name: {picture.Name}");
-                        // Add more picture-specific logic as needed
-                    }
-                    // Add more conditions for other types of drawings (e.g., shapes)
-
-                    // Common properties for all drawings
-                    Console.WriteLine($"Drawing Type: {drawing.GetType().Name}");
-                    Console.WriteLine($"Description: {drawing.Description}");
-                    Console.WriteLine($"Position: {drawing.From.Column}, {drawing.From.Row}");
-                    Console.WriteLine($"Size: {drawing.To.Column - drawing.From.Column}, {drawing.To.Row - drawing.From.Row}");
-                    Console.WriteLine();
-
-                }
                 package.Save();
             }
+        }
+
+        private static void MaakBarChartMaand(ExcelWorksheet worksheetBarCharts, ExcelWorksheet worksheetOverzicht, string chartName, string dataRange, string categoryRange, int positionX, int positionY)
+        {
+            var existingChart = worksheetBarCharts.Drawings[chartName] as ExcelChart;
+            if (existingChart != null)
+            {
+                worksheetBarCharts.Drawings.Remove(existingChart);
+            }
+            var chart = worksheetBarCharts.Drawings.AddChart(chartName, eChartType.ColumnClustered);
+            var series = chart.Series.Add(worksheetOverzicht.Cells[dataRange], worksheetOverzicht.Cells[categoryRange]);
+            series.Fill.Color = System.Drawing.Color.FromArgb(255, 217, 102);
+            chart.Title.Text = chartName;
+            chart.Title.Font.Bold = true;
+            chart.Title.Font.Size = 16;
+            chart.Legend.Remove();
+            chart.SetPosition(positionX, 0, positionY, 0);
+            chart.SetSize(650, 390);
+            chart.YAxis.MinorTickMark = eAxisTickMark.None;
+            chart.XAxis.MajorTickMark = eAxisTickMark.None;
+            chart.XAxis.MinorTickMark = eAxisTickMark.None;
+            chart.Fill.Style = eFillStyle.SolidFill;
+            chart.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+            chart.PlotArea.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
         }
 
         private static bool IsChartPresentAtCell(ExcelWorksheet worksheet, int targetRow, int targetColumn)
@@ -376,7 +384,7 @@ namespace IngExportInlezen.Services
             return false;
         }
 
-        private static void PopulateOverzicht(ExcelWorksheet worksheet, int columnNumber, int rowNumberOverzicht, List<IngExport_Internal> data)
+        private static void PopulateOverzicht(ExcelWorksheet worksheet, int columnNumber, int rowNumberOverzicht, List<IngExport_Internal> data, bool isOverigeKosten = false)
         {
             var sumBedrag = data.Sum(x => x.Bedrag);
             worksheet.Cells[rowNumberOverzicht, columnNumber].Value = sumBedrag;
@@ -389,7 +397,16 @@ namespace IngExportInlezen.Services
             }
             var average = cellValues.Average();
             var stDev = StdDev(cellValues, average);
-            var com = average + stDev;
+
+            double com;
+            if (isOverigeKosten)
+            {
+                com = average - stDev;
+            }
+            else
+            {
+                com = average + stDev;
+            }
 
             var cell1 = worksheet.Cells[rowNumberOverzicht, columnNumber - 1];
             cell1.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -397,13 +414,27 @@ namespace IngExportInlezen.Services
 
             var cell2 = worksheet.Cells[rowNumberOverzicht, columnNumber];
             cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-            if ((double)sumBedrag > com)
+            if (isOverigeKosten)
             {
-                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                if ((double)sumBedrag < com)
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                }
+                else
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                }
             }
             else
             {
-                cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                if ((double)sumBedrag > com)
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                }
+                else
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+                }
             }
         }
 
