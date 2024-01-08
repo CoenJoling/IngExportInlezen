@@ -1,5 +1,4 @@
 ﻿using IngExportInlezen.Domain;
-using Microsoft.Extensions.Configuration;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -29,15 +28,15 @@ namespace IngExportInlezen.Services
             using (ExcelPackage package = new ExcelPackage(existingFile))
             {
                 ExcelWorksheet overzicht = package.Workbook.Worksheets[0];
-                ExcelWorksheet abonnementen = package.Workbook.Worksheets[1];
-                ExcelWorksheet boodschappen = package.Workbook.Worksheets[2];
-                ExcelWorksheet geldOpnames = package.Workbook.Worksheets[3];
-                ExcelWorksheet inkomstenSalaris = package.Workbook.Worksheets[4];
-                ExcelWorksheet overigeInkomsten = package.Workbook.Worksheets[5];
+                ExcelWorksheet vasteLasten = package.Workbook.Worksheets[1];
+                ExcelWorksheet abonnementen = package.Workbook.Worksheets[2];
+                ExcelWorksheet tanken = package.Workbook.Worksheets[3];
+                ExcelWorksheet geldOpnames = package.Workbook.Worksheets[4];
+                ExcelWorksheet boodschappen = package.Workbook.Worksheets[5];
                 ExcelWorksheet overigeKosten = package.Workbook.Worksheets[6];
                 ExcelWorksheet spaarOpdrachten = package.Workbook.Worksheets[7];
-                ExcelWorksheet tanken = package.Workbook.Worksheets[8];
-                ExcelWorksheet vasteLasten = package.Workbook.Worksheets[9];
+                ExcelWorksheet inkomstenSalaris = package.Workbook.Worksheets[8];
+                ExcelWorksheet overigeInkomsten = package.Workbook.Worksheets[9];
 
                 var rowNumberOverzicht = overzicht.Dimension.Rows + 2;
                 var rowNumberAbonnementen = abonnementen.Dimension.Rows + 2;
@@ -50,13 +49,13 @@ namespace IngExportInlezen.Services
                 var rowNumberTanken = tanken.Dimension.Rows + 2;
                 var rowNumberVasteLasten = vasteLasten.Dimension.Rows + 2;
 
-                PopulateWorksheet(abonnementen, rowNumberAbonnementen, excelExport.Abonnementen, excelExport);
-                PopulateWorksheet(boodschappen, rowNumberBoodschappen, excelExport.Boodschappen, excelExport);
-                PopulateWorksheet(geldOpnames, rowNumberGeldOpnames, excelExport.GeldOpnames, excelExport);
-                PopulateWorksheet(inkomstenSalaris, rowNumberInkomstenSalaris, excelExport.InkomstenSalaris, excelExport);
-                PopulateWorksheet(overigeInkomsten, rowNumberOverigeInkomsten, excelExport.OverigeInkomsten, excelExport);
-                PopulateWorksheet(tanken, rowNumberTanken, excelExport.Tanken, excelExport);
-                PopulateWorksheet(vasteLasten, rowNumberVasteLasten, excelExport.VasteLasten, excelExport);
+                PopulateJaarWorksheet(abonnementen, rowNumberAbonnementen, excelExport.Abonnementen, excelExport);
+                PopulateJaarWorksheet(boodschappen, rowNumberBoodschappen, excelExport.Boodschappen, excelExport);
+                PopulateJaarWorksheet(geldOpnames, rowNumberGeldOpnames, excelExport.GeldOpnames, excelExport);
+                PopulateJaarWorksheet(inkomstenSalaris, rowNumberInkomstenSalaris, excelExport.InkomstenSalaris, excelExport);
+                PopulateJaarWorksheet(overigeInkomsten, rowNumberOverigeInkomsten, excelExport.OverigeInkomsten, excelExport);
+                PopulateJaarWorksheet(tanken, rowNumberTanken, excelExport.Tanken, excelExport);
+                PopulateJaarWorksheet(vasteLasten, rowNumberVasteLasten, excelExport.VasteLasten, excelExport);
 
                 #region Overige kosten
                 overigeKosten.Cells[rowNumberOverigeKosten, 2].Value = excelExport.Maand;
@@ -69,7 +68,7 @@ namespace IngExportInlezen.Services
                 {
                     var entry = excelExport.OverigeKosten[i];
                     overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 2].Value = entry.Naam;
-                    overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 3].Value = entry.Bedrag;
+                    overigeKosten.Cells[rowNumberOverigeKosten + i + 1, 3].Value = entry.Bedrag * -1;
 
                     var range = overigeKosten.Cells[$"B{rowNumberOverigeKosten + i + 1}:C{rowNumberOverigeKosten + i + 1}"];
                     range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -135,12 +134,12 @@ namespace IngExportInlezen.Services
                     overzicht.Cells[rowNumberOverzicht, i].Value = excelExport.Maand;
                 }
 
-                PopulateOverzicht(overzicht, 3, rowNumberOverzicht, excelExport.Abonnementen);
-                PopulateOverzicht(overzicht, 6, rowNumberOverzicht, excelExport.Boodschappen);
-                PopulateOverzicht(overzicht, 9, rowNumberOverzicht, excelExport.GeldOpnames);
-                PopulateOverzicht(overzicht, 12, rowNumberOverzicht, excelExport.InkomstenSalaris);
-                PopulateOverzicht(overzicht, 15, rowNumberOverzicht, excelExport.OverigeInkomsten);
-                PopulateOverzicht(overzicht, 18, rowNumberOverzicht, excelExport.OverigeKosten, true);
+                PopulateJaarOverzicht(overzicht, 6, rowNumberOverzicht, excelExport.Abonnementen);
+                PopulateJaarOverzicht(overzicht, 15, rowNumberOverzicht, excelExport.Boodschappen);
+                PopulateJaarOverzicht(overzicht, 12, rowNumberOverzicht, excelExport.GeldOpnames);
+                PopulateJaarOverzicht(overzicht, 24, rowNumberOverzicht, excelExport.InkomstenSalaris, false, true);
+                PopulateJaarOverzicht(overzicht, 27, rowNumberOverzicht, excelExport.OverigeInkomsten, false, true);
+                PopulateJaarOverzicht(overzicht, 18, rowNumberOverzicht, excelExport.OverigeKosten, true);
                 var spaarBedrag = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
                 overzicht.Cells[rowNumberOverzicht, 21].Value = spaarBedrag;
                 var cell1 = overzicht.Cells[rowNumberOverzicht, 20];
@@ -157,8 +156,8 @@ namespace IngExportInlezen.Services
                 {
                     cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
                 }
-                PopulateOverzicht(overzicht, 24, rowNumberOverzicht, excelExport.Tanken);
-                PopulateOverzicht(overzicht, 27, rowNumberOverzicht, excelExport.VasteLasten);
+                PopulateJaarOverzicht(overzicht, 9, rowNumberOverzicht, excelExport.Tanken);
+                PopulateJaarOverzicht(overzicht, 3, rowNumberOverzicht, excelExport.VasteLasten);
 
                 overzicht.Cells["C3"].Formula = $"SUM(C5:C{rowNumberOverzicht})";
                 overzicht.Cells["F3"].Formula = $"SUM(F5:F{rowNumberOverzicht})";
@@ -177,7 +176,7 @@ namespace IngExportInlezen.Services
             }
         }
 
-        public static void ExportToMaandExcel(ExcelExport excelExport)
+        public static void ExportToMaandExcel(ExcelExport excelExport, AppSettings appSettings)
         {
             string filePath = @"C:\Users\coenj\Documents\Financieel overzicht\ING export\Maandelijks Financieel Overzicht.xlsx";
 
@@ -197,25 +196,24 @@ namespace IngExportInlezen.Services
                 var rowNumber = worksheetOverzicht.Dimension.Rows + 2;
 
                 worksheetOverzicht.Cells[rowNumber, 2].Value = excelExport.Maand;
-                worksheetOverzicht.Cells[rowNumber, 3].Value = excelExport.VasteLasten.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 4].Value = excelExport.Abonnementen.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 5].Value = excelExport.Tanken.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 6].Value = excelExport.GeldOpnames.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 7].Value = excelExport.Boodschappen.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 8].Value = excelExport.OverigeKosten.Sum(x => x.Bedrag) * -1;
-                worksheetOverzicht.Cells[rowNumber, 9].Value = excelExport.SpaarOpdrachtenIngelegd.Sum(x => x.Bedrag) - excelExport.SpaarOpdrachtenOpgenomen.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 10].Value = excelExport.InkomstenSalaris.Sum(x => x.Bedrag);
-                worksheetOverzicht.Cells[rowNumber, 11].Value = excelExport.OverigeInkomsten.Sum(x => x.Bedrag);
-
-                //Nieuwe regel opmaak
-                var range = worksheetOverzicht.Cells[$"B{rowNumber}:K{rowNumber}"];
-                var rangeMin = worksheetOverzicht.Cells[$"B{rowNumber - 1}:K{rowNumber - 1}"];
-                range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
                 var maandCell = worksheetOverzicht.Cells[$"B{rowNumber}"];
-                var laatsteCell = worksheetOverzicht.Cells[$"K{rowNumber}"];
                 maandCell.Style.Font.Bold = true;
 
+                var range = worksheetOverzicht.Cells[$"B{rowNumber}:K{rowNumber}"];
+                range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(255, 220, 220));
+
+                PopulateMaandOverzicht(rowNumber, 3, excelExport.VasteLasten, worksheetOverzicht);
+                PopulateMaandOverzicht(rowNumber, 4, excelExport.Abonnementen, worksheetOverzicht);
+                PopulateMaandOverzicht(rowNumber, 5, excelExport.Tanken, worksheetOverzicht);
+                PopulateMaandOverzicht(rowNumber, 6, excelExport.GeldOpnames, worksheetOverzicht);
+                PopulateMaandOverzicht(rowNumber, 7, excelExport.Boodschappen, worksheetOverzicht);
+                PopulateMaandOverzicht(rowNumber, 8, excelExport.OverigeKosten, worksheetOverzicht, false, true);
+                PopulateMaandOverzicht(rowNumber, 9, excelExport.SpaarOpdrachtenIngelegd, worksheetOverzicht, false, false, true, excelExport.SpaarOpdrachtenOpgenomen, appSettings);
+                PopulateMaandOverzicht(rowNumber, 10, excelExport.InkomstenSalaris, worksheetOverzicht, true);
+                PopulateMaandOverzicht(rowNumber, 11, excelExport.OverigeInkomsten, worksheetOverzicht, true);
+
+                #region PieChart Overzicht
                 //Maken van pie chart.
                 var existingPieChart = worksheetOverzicht.Drawings["SpreidingKosten"];
                 if (existingPieChart != null)
@@ -238,8 +236,9 @@ namespace IngExportInlezen.Services
                 pieSerie.DataLabel.Position = eLabelPosition.OutEnd;
                 pieChart.Fill.Style = eFillStyle.SolidFill;
                 pieChart.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
+                #endregion
 
-
+                #region BudgetChart
                 // Maken van bugdget chart.
                 var budgetChart = worksheetOverzicht.Drawings["Budget"];
                 if (budgetChart != null)
@@ -261,6 +260,24 @@ namespace IngExportInlezen.Services
                 columnChart.Title.Font.Bold = true;
                 columnChart.Title.Font.Size = 16;
 
+                var cellG3 = Convert.ToDecimal(worksheetOverzicht.Cells["G3"].Value);
+                var cellH3 = Convert.ToDecimal(worksheetOverzicht.Cells["H3"].Value);
+                var cellI3 = Convert.ToDecimal(worksheetOverzicht.Cells["I3"].Value);
+                var newCellG = Convert.ToDecimal(worksheetOverzicht.Cells[$"G{rowNumber}"].Value);
+                var newCellH = Convert.ToDecimal(worksheetOverzicht.Cells[$"H{rowNumber}"].Value);
+                var newCellI = Convert.ToDecimal(worksheetOverzicht.Cells[$"I{rowNumber}"].Value);
+
+                if (cellG3 < newCellG || cellH3 < newCellH || cellI3 > newCellI)
+                {
+                    columnChart.Series[1].Fill.Color = System.Drawing.Color.FromArgb(255, 0, 0);
+                }
+                else
+                {
+                    columnChart.Series[1].Fill.Color = System.Drawing.Color.FromArgb(0, 255, 0);
+                }
+                #endregion
+
+                #region PieCharts
                 //Maken en behouden piechart in worksheetPieCharts
                 var row = 1;
                 var col = 1;
@@ -310,23 +327,9 @@ namespace IngExportInlezen.Services
                     row += 21;
                     col -= 11;
                 }
+                #endregion
 
-                var cellG3 = Convert.ToDecimal(worksheetOverzicht.Cells["G3"].Value);
-                var cellH3 = Convert.ToDecimal(worksheetOverzicht.Cells["H3"].Value);
-                var cellI3 = Convert.ToDecimal(worksheetOverzicht.Cells["I3"].Value);
-                var newCellG = Convert.ToDecimal(worksheetOverzicht.Cells[$"G{rowNumber}"].Value);
-                var newCellH = Convert.ToDecimal(worksheetOverzicht.Cells[$"H{rowNumber}"].Value);
-                var newCellI = Convert.ToDecimal(worksheetOverzicht.Cells[$"I{rowNumber}"].Value);
-
-                if (cellG3 < newCellG || cellH3 < newCellH || cellI3 > newCellI)
-                {
-                    columnChart.Series[1].Fill.Color = System.Drawing.Color.FromArgb(255, 0, 0);
-                }
-                else
-                {
-                    columnChart.Series[1].Fill.Color = System.Drawing.Color.FromArgb(0, 255, 0);
-                }
-
+                #region BarCharts
                 //Diagrammen grafieken worksheet
                 MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Abonnementen", $"D4:D{rowNumber}", $"B4:B{rowNumber}", 1, 1);
                 MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Vaste lasten", $"C4:C{rowNumber}", $"B4:B{rowNumber}", 1, 12);
@@ -337,6 +340,7 @@ namespace IngExportInlezen.Services
                 MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Inkomsten salaris", $"J4:J{rowNumber}", $"B4:B{rowNumber}", 64, 1);
                 MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Overige inkomsten", $"K4:K{rowNumber}", $"B4:B{rowNumber}", 64, 12);
                 MaakBarChartMaand(worksheetBarCharts, worksheetOverzicht, "Overige kosten", $"H4:H{rowNumber}", $"B4:B{rowNumber}", 85, 1);
+                #endregion
 
                 package.Save();
             }
@@ -366,6 +370,61 @@ namespace IngExportInlezen.Services
             chart.PlotArea.Fill.Color = System.Drawing.Color.FromArgb(255, 247, 247);
         }
 
+        private static void PopulateMaandOverzicht(int rowNumber, int columnNUmber, List<IngExport_Internal> data, ExcelWorksheet worksheetOverzicht, bool isInkomsten = false, bool isOverigeKosten = false, bool isSpaaropdrachten = false, List<IngExport_Internal> data2 = null, AppSettings appSettings = null)
+        {
+            decimal bedrag;
+            if (isOverigeKosten)
+            {
+                bedrag = data.Sum(x => x.Bedrag) * -1;
+            }
+            else if (isSpaaropdrachten)
+            {
+                bedrag = data.Sum(x => x.Bedrag) - data2.Sum(x => x.Bedrag);
+            }
+            else
+            {
+                bedrag = data.Sum(x => x.Bedrag);
+            }
+
+            worksheetOverzicht.Cells[rowNumber, columnNUmber].Value = bedrag;
+
+            var cellValues = new List<double>();
+            var cells = worksheetOverzicht.Cells[4, columnNUmber, rowNumber, columnNUmber];
+            foreach (var cell in cells)
+            {
+                cellValues.Add(Convert.ToDouble(cell.Value));
+            }
+            var average = cellValues.Average();
+            var stDev = StdDev(cellValues, average);
+
+            var avgBij = average + stDev;
+            var avgAf = average - stDev;
+
+            var cell2 = worksheetOverzicht.Cells[rowNumber, columnNUmber];
+            cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            if (isInkomsten)
+            {
+                if (avgBij < (double)bedrag || (double)bedrag < avgAf)
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                }
+            }
+            else if (isSpaaropdrachten)
+            {
+                if (bedrag < appSettings.Spaardoel)
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                }
+            }
+            else
+            {
+                if ((double)bedrag > avgBij)
+                {
+                    cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
+                }
+            }
+        }
+
         private static bool IsChartPresentAtCell(ExcelWorksheet worksheet, int targetRow, int targetColumn)
         {
             foreach (var drawing in worksheet.Drawings)
@@ -384,9 +443,18 @@ namespace IngExportInlezen.Services
             return false;
         }
 
-        private static void PopulateOverzicht(ExcelWorksheet worksheet, int columnNumber, int rowNumberOverzicht, List<IngExport_Internal> data, bool isOverigeKosten = false)
+        private static void PopulateJaarOverzicht(ExcelWorksheet worksheet, int columnNumber, int rowNumberOverzicht, List<IngExport_Internal> data, bool isOverigeKosten = false, bool isInkomsten = false)
         {
-            var sumBedrag = data.Sum(x => x.Bedrag);
+            decimal sumBedrag;
+            if(isOverigeKosten)
+            {
+                sumBedrag = data.Sum(x => x.Bedrag) * -1;
+            }
+            else
+            {
+                sumBedrag = data.Sum(x => x.Bedrag);
+            }
+            
             worksheet.Cells[rowNumberOverzicht, columnNumber].Value = sumBedrag;
 
             var cellValues = new List<double>();
@@ -398,15 +466,8 @@ namespace IngExportInlezen.Services
             var average = cellValues.Average();
             var stDev = StdDev(cellValues, average);
 
-            double com;
-            if (isOverigeKosten)
-            {
-                com = average - stDev;
-            }
-            else
-            {
-                com = average + stDev;
-            }
+            var avgBij = average + stDev;
+            var avgAf = average - stDev;
 
             var cell1 = worksheet.Cells[rowNumberOverzicht, columnNumber - 1];
             cell1.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -414,9 +475,9 @@ namespace IngExportInlezen.Services
 
             var cell2 = worksheet.Cells[rowNumberOverzicht, columnNumber];
             cell2.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-            if (isOverigeKosten)
+            if (isInkomsten)
             {
-                if ((double)sumBedrag < com)
+                if (avgBij < (double)sumBedrag || (double)sumBedrag < avgAf)
                 {
                     cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
                 }
@@ -427,7 +488,7 @@ namespace IngExportInlezen.Services
             }
             else
             {
-                if ((double)sumBedrag > com)
+                if ((double)sumBedrag > avgBij)
                 {
                     cell2.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(252, 90, 10));
                 }
@@ -446,7 +507,7 @@ namespace IngExportInlezen.Services
             return standardDeviation;
         }
 
-        private static void PopulateWorksheet(ExcelWorksheet worksheet, int rowNumber, List<IngExport_Internal> data, ExcelExport maand)
+        private static void PopulateJaarWorksheet(ExcelWorksheet worksheet, int rowNumber, List<IngExport_Internal> data, ExcelExport maand)
         {
             data = data.OrderBy(x => x.Datum).ToList();
 

@@ -150,7 +150,7 @@ namespace IngExportInlezen.Application
                                 }
                                     try
                                 {
-                                    ExcelExporter.ExportToMaandExcel(excelExport);
+                                    ExcelExporter.ExportToMaandExcel(excelExport, appSettings);
                                 }
                                 catch (Exception ex)
                                 {
